@@ -1,0 +1,21 @@
+PODS:
+  - neutrino (1.0)
+  - shared (1.0)
+
+DEPENDENCIES:
+  - neutrino (from `../neutrino`)
+  - shared (from `../shared`)
+
+EXTERNAL SOURCES:
+  neutrino:
+    :path: "../neutrino"
+  shared:
+    :path: "../shared"
+
+SPEC CHECKSUMS:
+  neutrino: 1968fab4772da7dab2b88fed7c4dce2105fc156a
+  shared: 48ca5253977edbfbd4af5e682e22265c4cd14ba3
+
+PODFILE CHECKSUM: aad155f4cca1adf7666120ca276512ac1246f242
+
+COCOAPODS: 1.11.2
