@@ -1,7 +1,7 @@
 package com.kleinstein.neutrino.fabrics
 
-class Singleton<T>(fabric: () -> T): IFabric<T> {
+class Singleton<T: Any>(fabric: () -> T): IFabric<T> {
     private val instance = fabric()
 
-    override fun build(): T = instance
+    override fun buildOrGet(): T = instance
 }

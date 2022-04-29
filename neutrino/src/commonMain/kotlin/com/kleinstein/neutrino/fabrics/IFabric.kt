@@ -1,5 +1,5 @@
 package com.kleinstein.neutrino.fabrics
 
-interface IFabric<T> {
-    fun build(): T
+interface IFabric<T: Any> {
+    fun buildOrGet(): T
 }

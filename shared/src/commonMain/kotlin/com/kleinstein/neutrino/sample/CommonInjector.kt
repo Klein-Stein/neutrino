@@ -1,13 +1,17 @@
 package com.kleinstein.neutrino.sample
 
-import com.kleinstein.neutrino.fabrics.Provider
-import com.kleinstein.neutrino.fabrics.Singleton
+import com.kleinstein.neutrino.*
+import com.kleinstein.neutrino.contracts.lazySingleton
+import com.kleinstein.neutrino.contracts.provider
+import com.kleinstein.neutrino.contracts.resolve
 
 object CommonInjector {
-    val greetingSingleton = Singleton {
-        Greeting()
+    val mainModule = Module("main") {
+        lazySingleton { Greeting() }
+        provider { GreetingContainer(resolve()) }
     }
-    val greetingProvider = Provider {
-        Greeting()
-    }
+
+    val injector = Injector {
+        import(mainModule)
+    }.build()
 }

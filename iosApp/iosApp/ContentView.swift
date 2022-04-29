@@ -3,12 +3,10 @@ import shared
 import neutrino
 
 struct ContentView: View {
-    let injector = CommonInjector.injector
 
 	var body: some View {
         VStack {
-            Text("Singleton: " + injector.greetingSingleton.build()!.greeting())
-            Text("Provider: " + injector.greetingProvider.build()!.greeting())
+            Text("Works!")
         }
 	}
 }
