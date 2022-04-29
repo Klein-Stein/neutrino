@@ -6,12 +6,12 @@ import com.kleinstein.neutrino.contracts.provider
 import com.kleinstein.neutrino.contracts.resolve
 
 object CommonInjector {
-    val mainModule = Module("main") {
+    val mainModule = DI.module("main") {
         lazySingleton { Greeting() }
         provider { GreetingContainer(resolve()) }
     }
 
-    val injector = Injector {
+    val injector = DI.injector("main") {
         import(mainModule)
     }.build()
 }

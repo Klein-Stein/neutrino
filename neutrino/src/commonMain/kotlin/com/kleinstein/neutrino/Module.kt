@@ -19,7 +19,7 @@ class Module(override val name: String, private val body: IModule.() -> Unit) :
         return this
     }
 
-    override fun containsTag(tag: String): Boolean = fabrics.containsKey(tag)
+    override fun contains(tag: String): Boolean = fabrics.containsKey(tag)
 
     override fun <T : Any> resolve(clazz: KClass<out T>): T = resolve(clazz.qualifiedName!!, clazz)
 

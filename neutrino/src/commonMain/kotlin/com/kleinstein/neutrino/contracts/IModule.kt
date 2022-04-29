@@ -5,11 +5,9 @@ import com.kleinstein.neutrino.fabrics.LazySingleton
 import com.kleinstein.neutrino.fabrics.Provider
 import com.kleinstein.neutrino.fabrics.Singleton
 
-interface IModule: IResolvable, IBuildable<IModule> {
-    val name: String
-
+interface IModule: INamed, IResolvable, IBuildable<IModule> {
     fun <T: Any> addFabric(tag: String, fabric: IFabric<T>)
-    fun containsTag(tag: String): Boolean
+    fun contains(tag: String): Boolean
 }
 
 inline fun <reified T: Any> IModule.addFabric(fabric: IFabric<T>) =

@@ -1,21 +1,23 @@
 package com.kleinstein.neutrino
 
+import com.kleinstein.neutrino.contracts.IExtendable
 import com.kleinstein.neutrino.contracts.IInjector
 import com.kleinstein.neutrino.contracts.IModule
 import com.kleinstein.neutrino.exceptions.NeutrinoException
 import kotlin.reflect.KClass
 
-class Injector(private val body: IInjector.() -> Unit): IInjector {
+class Injector(override val name: String, private val body: IExtendable<IModule>.() -> Unit) :
+    IInjector {
     private val modules = mutableListOf<IModule>()
 
-    override fun import(module: IModule) {
-        modules.add(module.build())
+    override fun import(child: IModule) {
+        modules.add(child.build())
     }
 
-    override fun importAll(vararg modules: IModule) {
-        if (modules.any()) {
-            this.modules.addAll(modules)
-            modules.forEach { it.build() }
+    override fun importAll(vararg children: IModule) {
+        if (children.any()) {
+            modules.addAll(children)
+            children.forEach { it.build() }
         }
     }
 
@@ -24,7 +26,7 @@ class Injector(private val body: IInjector.() -> Unit): IInjector {
 
     override fun <T : Any> resolve(tag: String, clazz: KClass<out T>): T {
         modules.forEach { module ->
-            if (module.containsTag(tag)) {
+            if (module.contains(tag)) {
                 return module.resolve(tag, clazz)
             }
         }

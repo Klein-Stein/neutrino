@@ -9,7 +9,7 @@ import com.kleinstein.neutrino.sample.CommonInjector
 import com.kleinstein.neutrino.sample.Greeting
 
 class App: Application() {
-    private val androidModule = Module("android") {
+    private val androidModule = DI.module("android") {
         singleton { Greeting() }
         lazySingleton { Greeting() }
         provider { Greeting() }
@@ -18,7 +18,11 @@ class App: Application() {
         provider("provider") { Greeting() }
     }
 
-    val injector = Injector {
+    private val injector = DI.injector("main") {
         importAll(androidModule, CommonInjector.mainModule)
-    }.build()
+    }
+
+    init {
+        DI.global.import(injector)
+    }
 }
