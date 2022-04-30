@@ -26,7 +26,7 @@ class Injector(override val name: String, private val body: IExtendable<IModule>
 
     override fun <T : Any> resolve(tag: String, clazz: KClass<out T>): T {
         modules.forEach { module ->
-            if (module.contains(tag)) {
+            if (module.containsTag(tag)) {
                 return module.resolve(tag, clazz)
             }
         }
@@ -38,7 +38,7 @@ class Injector(override val name: String, private val body: IExtendable<IModule>
 
     override fun <T : Any> resolveLazy(tag: String, clazz: KClass<out T>): Lazy<T> {
         modules.forEach { module ->
-            if (module.contains(tag)) {
+            if (module.containsTag(tag)) {
                 return module.resolveLazy(tag, clazz)
             }
         }

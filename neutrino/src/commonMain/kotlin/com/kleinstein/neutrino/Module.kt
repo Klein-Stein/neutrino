@@ -9,7 +9,7 @@ import kotlin.reflect.cast
 
 class Module(override val name: String, private val body: IModule.() -> Unit) :
     IModule {
-    internal val fabrics = HashMap<String, IFabric<*>>()
+    private val fabrics = hashMapOf<String, IFabric<*>>()
 
     override fun <T : Any> addFabric(tag: String, fabric: IFabric<T>) {
         fabrics[tag] = fabric
@@ -20,7 +20,20 @@ class Module(override val name: String, private val body: IModule.() -> Unit) :
         return this
     }
 
-    override fun contains(tag: String): Boolean = fabrics.containsKey(tag)
+    override val size: Int
+        get() = fabrics.size
+
+    override fun containsAll(elements: Collection<Map.Entry<String, IFabric<*>>>): Boolean =
+        fabrics.entries.containsAll(elements)
+
+    override fun isEmpty(): Boolean = fabrics.isEmpty()
+
+    override fun iterator(): Iterator<Map.Entry<String, IFabric<*>>> = fabrics.iterator()
+
+    override fun containsTag(tag: String): Boolean = fabrics.containsKey(tag)
+
+    override fun contains(element: Map.Entry<String, IFabric<*>>): Boolean =
+        fabrics.entries.contains(element)
 
     override fun <T : Any> resolve(clazz: KClass<out T>): T = resolve(clazz.qualifiedName!!, clazz)
 
