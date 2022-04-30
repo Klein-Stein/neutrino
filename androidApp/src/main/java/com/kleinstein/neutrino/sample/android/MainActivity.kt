@@ -5,7 +5,7 @@ import android.os.Bundle
 import com.kleinstein.neutrino.sample.Greeting
 import android.widget.TextView
 import com.kleinstein.neutrino.DI
-import com.kleinstein.neutrino.contracts.resolve
+import com.kleinstein.neutrino.resolve
 
 class MainActivity : AppCompatActivity() {
     private val di = DI.global()

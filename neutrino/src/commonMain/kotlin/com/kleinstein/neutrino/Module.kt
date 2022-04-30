@@ -2,13 +2,14 @@ package com.kleinstein.neutrino
 
 import com.kleinstein.neutrino.contracts.IModule
 import com.kleinstein.neutrino.exceptions.NeutrinoException
-import com.kleinstein.neutrino.fabrics.IFabric
+import com.kleinstein.neutrino.contracts.IFabric
+import com.kleinstein.neutrino.contracts.ILazyFabric
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
 class Module(override val name: String, private val body: IModule.() -> Unit) :
     IModule {
-    private val fabrics = HashMap<String, IFabric<*>>()
+    internal val fabrics = HashMap<String, IFabric<*>>()
 
     override fun <T : Any> addFabric(tag: String, fabric: IFabric<T>) {
         fabrics[tag] = fabric
@@ -34,5 +35,18 @@ class Module(override val name: String, private val body: IModule.() -> Unit) :
             )
         }
         return clazz.cast(obj)
+    }
+
+    override fun <T : Any> resolveLazy(clazz: KClass<out T>): Lazy<T> =
+        resolveLazy(clazz.qualifiedName!!, clazz)
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> resolveLazy(tag: String, clazz: KClass<out T>): Lazy<T> {
+        val fabric = fabrics[tag] ?: throw NeutrinoException("The `$tag` not found")
+        if (fabric !is ILazyFabric<*>) {
+            throw NeutrinoException("Can't resolve `$tag` tag: the object is not lazy")
+        }
+        val obj = fabric.buildOrGet()
+        return obj as Lazy<T>
     }
 }

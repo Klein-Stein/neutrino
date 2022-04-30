@@ -1,7 +1,9 @@
 package com.kleinstein.neutrino.fabrics
 
-class LazySingleton<T: Any>(fabric: () -> T) : IFabric<T> {
-    private val instance by lazy(fabric)
+import com.kleinstein.neutrino.contracts.ILazyFabric
 
-    override fun buildOrGet(): T = instance
+class LazySingleton<T: Any>(fabric: () -> T) : ILazyFabric<T> {
+    private val instance = lazy(fabric)
+
+    override fun buildOrGet(): Lazy<T> = instance
 }
