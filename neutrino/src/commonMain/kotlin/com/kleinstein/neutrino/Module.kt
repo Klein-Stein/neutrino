@@ -60,6 +60,14 @@ class Module(override val name: String, private val body: IModule.() -> Unit) :
             throw NeutrinoException("Can't resolve `$tag` tag: the object is not lazy")
         }
         val obj = fabric.buildOrGet()
-        return obj as Lazy<T>
+        val castedObj = obj as? Lazy<T>
+        if (castedObj == null) {
+            val objType = obj::class.qualifiedName!!
+            val tType = clazz.qualifiedName!!
+            throw NeutrinoException(
+                "Can't resolve `$tag` tag: `Lazy<$objType>` can't be casted to `Lazy<$tType>`"
+            )
+        }
+        return castedObj
     }
 }

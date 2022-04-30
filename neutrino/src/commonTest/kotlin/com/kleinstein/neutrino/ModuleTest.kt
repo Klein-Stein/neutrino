@@ -20,8 +20,10 @@ class ModuleTest {
             addFabric("stub1", Singleton { Stub() })
             addFabric("stub2", Singleton { Stub() })
         }
+        assertTrue(module.isEmpty())
         assertEquals(0, module.size)
         module.build()
+        assertTrue(module.isNotEmpty())
         assertEquals(2, module.size)
         assertTrue { module.containsTag("stub1") }
         assertTrue { module.containsTag("stub2") }

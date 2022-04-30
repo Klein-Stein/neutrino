@@ -32,6 +32,8 @@ class Injector(override val name: String, private val body: IExtendable<IModule>
 
     override fun iterator(): Iterator<IModule> = modules.iterator()
 
+    override fun containsModuleName(name: String): Boolean = modules.any { it.name == name }
+
     override fun <T : Any> resolve(clazz: KClass<out T>): T =
         this.resolve(clazz.simpleName!!, clazz)
 
