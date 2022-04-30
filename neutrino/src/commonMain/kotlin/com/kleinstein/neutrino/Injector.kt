@@ -10,6 +10,9 @@ class Injector(override val name: String, private val body: IExtendable<IModule>
     IInjector {
     private val modules = mutableListOf<IModule>()
 
+    override val size: Int
+        get() = modules.size
+
     override fun import(child: IModule) {
         modules.add(child.build())
     }
@@ -20,6 +23,14 @@ class Injector(override val name: String, private val body: IExtendable<IModule>
             children.forEach { it.build() }
         }
     }
+
+    override fun contains(element: IModule): Boolean = modules.contains(element)
+
+    override fun containsAll(elements: Collection<IModule>): Boolean = modules.containsAll(elements)
+
+    override fun isEmpty(): Boolean = modules.isEmpty()
+
+    override fun iterator(): Iterator<IModule> = modules.iterator()
 
     override fun <T : Any> resolve(clazz: KClass<out T>): T =
         this.resolve(clazz.simpleName!!, clazz)

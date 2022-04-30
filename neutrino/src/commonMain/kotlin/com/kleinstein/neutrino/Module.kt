@@ -11,6 +11,9 @@ class Module(override val name: String, private val body: IModule.() -> Unit) :
     IModule {
     private val fabrics = hashMapOf<String, IFabric<*>>()
 
+    override val size: Int
+        get() = fabrics.size
+
     override fun <T : Any> addFabric(tag: String, fabric: IFabric<T>) {
         fabrics[tag] = fabric
     }
@@ -19,9 +22,6 @@ class Module(override val name: String, private val body: IModule.() -> Unit) :
         body()
         return this
     }
-
-    override val size: Int
-        get() = fabrics.size
 
     override fun containsAll(elements: Collection<Map.Entry<String, IFabric<*>>>): Boolean =
         fabrics.entries.containsAll(elements)
