@@ -1,14 +1,12 @@
 package com.kleinstein.neutrino.sample
 
 import com.kleinstein.neutrino.*
+import kotlin.native.concurrent.ThreadLocal
 
+@ThreadLocal
 object CommonInjector {
     val mainModule = DI.module("main") {
-        lazySingleton { Greeting() }
+        singleton { Greeting() }
         provider { GreetingContainer(resolve()) }
     }
-
-    val injector = DI.injector("main") {
-        import(mainModule)
-    }.build()
 }

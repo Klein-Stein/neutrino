@@ -16,10 +16,10 @@ class App: Application() {
     }
 
     private val injector = DI.injector("main") {
-        importAll(androidModule, CommonInjector.mainModule)
+        attachAll(androidModule, CommonInjector.mainModule)
     }
 
     init {
-        DI.global.import(injector)
+        DI.global.attach(injector)
     }
 }

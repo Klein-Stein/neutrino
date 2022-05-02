@@ -42,4 +42,14 @@ class ModuleTest {
         assertNotEquals(stub1, stub2)
         assertTrue(lazyStubSingleton1.isInitialized())
     }
+
+    @Test
+    fun removingTest() {
+        val module = Module("test") {
+            addFabric("stub1", Singleton { Stub() })
+        }.build()
+        assertTrue(module.isNotEmpty())
+        module.removeFabric("stub1")
+        assertTrue(module.isEmpty())
+    }
 }

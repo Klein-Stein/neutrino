@@ -1,3 +1,3 @@
 package com.kleinstein.neutrino.fabrics
 
-class Stub
+class Stub(val name: String = "")

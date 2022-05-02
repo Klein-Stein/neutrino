@@ -9,18 +9,22 @@ class NeutrinoDI(private val body: NeutrinoDI.() -> Unit): DI {
     override val size: Int
         get() = injectors.size
 
-    override fun import(child: IInjector) {
+    override fun attach(child: IInjector) {
         injectors[child.name] = child.build()
     }
 
-    override fun importAll(vararg children: IInjector) {
+    override fun attachAll(vararg children: IInjector) {
         if (children.any()) {
-            children.forEach { import(it) }
+            children.forEach { attach(it) }
         }
     }
 
+    override fun contains(name: String): Boolean = injectors.containsKey(name)
+
     override fun contains(element: Map.Entry<String, IInjector>): Boolean =
         injectors.entries.contains(element)
+
+    override fun detach(name: String): IInjector? = injectors.remove(name)
 
     override fun containsAll(elements: Collection<Map.Entry<String, IInjector>>): Boolean =
         injectors.entries.containsAll(elements)

@@ -13,26 +13,34 @@ class Injector(override val name: String, private val body: IExtendable<IModule>
     override val size: Int
         get() = modules.size
 
-    override fun import(child: IModule) {
+    override fun attach(child: IModule) {
         modules.add(child.build())
     }
 
-    override fun importAll(vararg children: IModule) {
+    override fun attachAll(vararg children: IModule) {
         if (children.any()) {
             modules.addAll(children)
             children.forEach { it.build() }
         }
     }
 
+    override fun contains(name: String): Boolean = modules.any { it.name == name }
+
     override fun contains(element: IModule): Boolean = modules.contains(element)
+
+    override fun detach(name: String): IModule? {
+        val module = modules.find { it.name == name }
+        if (module != null) {
+            modules.remove(module)
+        }
+        return module
+    }
 
     override fun containsAll(elements: Collection<IModule>): Boolean = modules.containsAll(elements)
 
     override fun isEmpty(): Boolean = modules.isEmpty()
 
     override fun iterator(): Iterator<IModule> = modules.iterator()
-
-    override fun containsModuleName(name: String): Boolean = modules.any { it.name == name }
 
     override fun <T : Any> resolve(clazz: KClass<out T>): T =
         this.resolve(clazz.simpleName!!, clazz)

@@ -18,7 +18,7 @@ interface DI: IBuildable<DI>, IExtendable<IInjector>, Collection<Map.Entry<Strin
 }
 
 inline fun <reified T: Any> IModule.addFabric(fabric: IFabric<T>) =
-    addFabric(T::class.qualifiedName!!, fabric)
+    addFabric(T::class.simpleName!!, fabric)
 
 inline fun <reified T: Any> IModule.singleton(noinline fabric: () -> T) {
     this.addFabric(Singleton(fabric))
@@ -47,3 +47,8 @@ fun <T: Any> IModule.provider(tag: String, fabric: () -> T) {
 inline fun <reified T: Any> IResolvable.resolve(tag: String): T = resolve(tag, T::class)
 
 inline fun <reified T: Any> IResolvable.resolve(): T = resolve(T::class)
+
+inline fun <reified T: Any> IResolvable.resolveLazy(tag: String): Lazy<T> =
+    resolveLazy(tag, T::class)
+
+inline fun <reified T: Any> IResolvable.resolveLazy(): Lazy<T> = resolveLazy(T::class)
