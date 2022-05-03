@@ -1,10 +1,21 @@
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
+    id("maven-publish")
+    id("signing")
     id("com.android.library")
 }
 
+group = "io.github.kleinstein"
 version = "1.0"
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            artifactId = "neutrino"
+        }
+    }
+}
 
 kotlin {
     android()
@@ -14,7 +25,7 @@ kotlin {
 
     cocoapods {
         summary = "Simple DI for KMM"
-        homepage = "https://github.com/Klein-Stein/neutrino"
+        homepage = "https://klein-stein.github.io/neutrino/"
         ios.deploymentTarget = "14.1"
         framework {
             baseName = "neutrino"

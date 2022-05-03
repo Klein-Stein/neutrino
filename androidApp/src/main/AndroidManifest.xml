@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kleinstein.neutrino.sample.android">
+    package="io.github.kleinstein.neutrino.sample.android">
 
     <application
         android:allowBackup="false"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".App">
+        android:name="io.github.kleinstein.neutrino.sample.android.App">
         <activity
-            android:name=".MainActivity"
+            android:name="io.github.kleinstein.neutrino.sample.android.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

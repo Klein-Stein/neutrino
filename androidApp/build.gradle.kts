@@ -6,7 +6,7 @@ plugins {
 android {
     compileSdk = 32
     defaultConfig {
-        applicationId = "com.kleinstein.neutrino.sample.android"
+        applicationId = "io.github.kleinstein.neutrino.sample.android"
         minSdk = 16
         targetSdk = 32
         versionCode = 1

@@ -13,8 +13,8 @@ kotlin {
     iosSimulatorArm64()
 
     cocoapods {
-        summary = "Sample of usage for neutrino"
-        homepage = "https://github.com/Klein-Stein/neutrino"
+        summary = "Simple DI for KMM"
+        homepage = "https://klein-stein.github.io/neutrino/"
         ios.deploymentTarget = "14.1"
         podfile = project.file("../iosApp/Podfile")
         framework {
