@@ -9,7 +9,7 @@ Gradle (Groovy):
 ```groovy
 commonMain {
     dependencies {
-        implementation 'com.kleinstein:neutrino:1.0'
+        implementation 'io.github.klein-stein:neutrino:1.0'
     }
 }
 ```
@@ -19,7 +19,7 @@ Gradle (Kotlin DSL):
 ```kotlin
 commonMain {
     dependencies {
-        implementation("com.kleinstein:neutrino:1.0")
+        implementation("io.github.klein-stein:neutrino:1.0")
     }
 }
 ```
@@ -31,7 +31,7 @@ To use Neutrino in Android app directly just add it to dependencies as other lib
 
 Example of declaration:
 ```kotlin
-import com.kleinstein.neutrino.*
+import io.github.kleinstein.neutrino.*
 import kotlin.native.concurrent.ThreadLocal
 
 class Stub(val name: String)
@@ -157,4 +157,4 @@ provider { SomeObjectToBeProvider() }
 Any changes in pull requests must be offshoots from the devel branch.
 
 ## Licensing
-Project is licensed under the MIT license. See [LICENSE](LICENSE.txt) for the full license text.
+Project is licensed under the MIT license. See [LICENSE](https://github.com/Klein-Stein/neutrino/blob/master/LICENSE.txt) for the full license text.
