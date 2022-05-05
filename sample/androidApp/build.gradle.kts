@@ -21,7 +21,7 @@ android {
 
 dependencies {
     implementation(project(":shared"))
-    implementation("io.github.kleinstein:neutrino:1.0")
+    implementation("io.github.klein-stein:neutrino:1.0")
     implementation("com.google.android.material:material:1.6.0")
     implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.3")

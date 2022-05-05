@@ -5,7 +5,7 @@ plugins {
     id("com.android.library")
 }
 
-group = "io.github.kleinstein"
+group = "io.github.klein-stein"
 version = "1.0"
 
 kotlin {
