@@ -1,11 +1,9 @@
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
-    id("convention.publication")
     id("com.android.library")
 }
 
-group = "io.github.kleinstein"
 version = "1.0"
 
 kotlin {
@@ -14,21 +12,22 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
-    android {
-        publishLibraryVariants("release", "debug")
-    }
-
     cocoapods {
         summary = "Simple DI for KMM"
         homepage = "https://klein-stein.github.io/neutrino/"
         ios.deploymentTarget = "14.1"
+        podfile = project.file("../iosApp/Podfile")
         framework {
-            baseName = "neutrino"
+            baseName = "shared"
         }
     }
-
+    
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                implementation("io.github.kleinstein:neutrino:1.0")
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))

@@ -3,9 +3,10 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
+        mavenLocal()
     }
 }
 
-rootProject.name = "neutrino"
-include(":neutrino")
-includeBuild("convention-plugins")
+rootProject.name = "sample"
+include(":androidApp")
+include(":shared")
