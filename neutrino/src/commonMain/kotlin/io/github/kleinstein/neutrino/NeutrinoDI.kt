@@ -36,7 +36,7 @@ class NeutrinoDI(private val body: NeutrinoDI.() -> Unit): DI {
     override operator fun get(name: String): IInjector = injectors[name]!!
     override operator fun invoke(): IInjector {
         if (injectors.size == 1) {
-            injectors.entries.first().value
+            return injectors.entries.first().value
         }
         throw NeutrinoException(
             "More than 1 registered injector found, use `[]` to select the correct injector"
