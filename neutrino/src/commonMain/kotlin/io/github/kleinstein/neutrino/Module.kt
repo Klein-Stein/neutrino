@@ -3,12 +3,10 @@ package io.github.kleinstein.neutrino
 import io.github.kleinstein.neutrino.contracts.IModule
 import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 import io.github.kleinstein.neutrino.contracts.IFabric
-import io.github.kleinstein.neutrino.contracts.ILazyFabric
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
-class Module(override val name: String, private val body: IModule.() -> Unit) :
-    IModule {
+class Module(override val name: String, private val body: IModule.() -> Unit) : IModule {
     private val fabrics = hashMapOf<String, IFabric<*>>()
 
     override val size: Int
@@ -50,26 +48,5 @@ class Module(override val name: String, private val body: IModule.() -> Unit) :
             )
         }
         return clazz.cast(obj)
-    }
-
-    override fun <T : Any> resolveLazy(clazz: KClass<out T>): Lazy<T> =
-        resolveLazy(clazz.simpleName!!, clazz)
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> resolveLazy(tag: String, clazz: KClass<out T>): Lazy<T> {
-        val fabric = fabrics[tag] ?: throw NeutrinoException("The `$tag` not found")
-        if (fabric !is ILazyFabric<*>) {
-            throw NeutrinoException("Can't resolve `$tag` tag: the object is not lazy")
-        }
-        val obj = fabric.buildOrGet()
-        val castedObj = obj as? Lazy<T>
-        if (castedObj == null) {
-            val objType = obj::class.simpleName!!
-            val tType = clazz.simpleName!!
-            throw NeutrinoException(
-                "Can't resolve `$tag` tag: `Lazy<$objType>` can't be casted to `Lazy<$tType>`"
-            )
-        }
-        return castedObj
     }
 }

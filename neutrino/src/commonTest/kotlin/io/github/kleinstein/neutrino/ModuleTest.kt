@@ -1,6 +1,5 @@
 package io.github.kleinstein.neutrino
 
-import io.github.kleinstein.neutrino.fabrics.LazySingleton
 import io.github.kleinstein.neutrino.fabrics.Singleton
 import io.github.kleinstein.neutrino.fabrics.Stub
 import kotlin.test.*
@@ -32,12 +31,11 @@ class ModuleTest {
     @Test
     fun resolvingTest() {
         val module = Module("test") {
-            addFabric("stub1", LazySingleton { Stub() })
-            addFabric("stub2", Singleton { Stub() })
+            addFabric("stub1", Singleton { Stub() })
         }.build()
-        val lazyStubSingleton1 = module.resolveLazy("stub1", Stub::class)
+        val lazyStubSingleton1 = module.resolveLazy<Stub>("stub1")
         val stub1 by lazyStubSingleton1
-        val stub2 = module.resolve("stub2", Stub::class)
+        val stub2 = module.resolve("stub1", Stub::class)
         assertFalse(lazyStubSingleton1.isInitialized())
         assertNotEquals(stub1, stub2)
         assertTrue(lazyStubSingleton1.isInitialized())

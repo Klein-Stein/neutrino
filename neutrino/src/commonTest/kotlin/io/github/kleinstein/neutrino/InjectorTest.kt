@@ -1,6 +1,5 @@
 package io.github.kleinstein.neutrino
 
-import io.github.kleinstein.neutrino.fabrics.LazySingleton
 import io.github.kleinstein.neutrino.fabrics.Singleton
 import io.github.kleinstein.neutrino.fabrics.Stub
 import kotlin.test.Test
@@ -24,8 +23,7 @@ class InjectorTest {
             addFabric("stub2", Singleton { Stub() })
         }
         val test2Module = Module("test2") {
-            addFabric("stub1", LazySingleton { Stub() })
-            addFabric("stub2", Singleton { Stub() })
+            addFabric("stub1", Singleton { Stub() })
         }
         val injector = Injector("test") {
             attachAll(test1Module, test2Module)
@@ -46,14 +44,13 @@ class InjectorTest {
         }
         val test2Module = Module("test2") {
             addFabric("stub1", Singleton { Stub("stub2") })
-            addFabric("lazyStub", LazySingleton { Stub("lazyStub") })
         }
         val injector = Injector("test") {
             attachAll(test1Module, test2Module)
         }.build()
         val stub1 = injector.resolve("stub1", Stub::class)
         assertEquals("stub1", stub1.name)
-        val lazyStub = injector.resolveLazy("lazyStub", Stub::class)
+        val lazyStub = injector.resolveLazy<Stub>("lazyStub")
         val stub3 by lazyStub
         assertFalse(lazyStub.isInitialized())
         assertEquals("lazyStub", stub3.name)

@@ -54,18 +54,6 @@ class Injector(override val name: String, private val body: IExtendable<IModule>
         throw NeutrinoException("The `$tag` not found")
     }
 
-    override fun <T : Any> resolveLazy(clazz: KClass<out T>): Lazy<T> =
-        resolveLazy(clazz.simpleName!!, clazz)
-
-    override fun <T : Any> resolveLazy(tag: String, clazz: KClass<out T>): Lazy<T> {
-        modules.forEach { module ->
-            if (module.containsTag(tag)) {
-                return module.resolveLazy(tag, clazz)
-            }
-        }
-        throw NeutrinoException("The `$tag` not found")
-    }
-
     override fun build(): IInjector {
         body()
         return this

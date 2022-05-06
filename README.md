@@ -43,16 +43,12 @@ object CommonInjector {
         singleton { Stub("mainSingleton") }
         singleton("singleton2") { Stub("mainSingleton2") } // Use tags to inject two separate 
                                                            // instances of the same type
-        lazySingleton("mainLazySingleton") { Stub("mainLazySingleton") }
         provider("mainProvider") { Stub("mainProvider") }
-        lazyProvider("mainLazyProvider") { Stub("mainLazyProvider") }
     }
 
     private val secondaryModule = DI.module("secondary") {
         singleton("secondarySingleton") { Stub("secondarySingleton") }
-        lazySingleton("secondaryLazySingleton") { Stub("secondaryLazySingleton") }
         provider("secondaryProvider") { Stub("secondaryProvider") }
-        lazyProvider("secondaryLazyProvider") { Stub("secondaryLazyProvider") }
     }
     
     private val injector = DI.injector("default") {
@@ -120,22 +116,14 @@ Neutrino offers several fabrics to create objects:
 singleton { SomeObjectToBeSingleton() }
 ```
 
-2. Lazy singletons, objects that will live while Neutrino module or references on the singletons 
-   exist. Unlikely the singletons, the lazy singletons will be initialized at the first access 
-   moment:
-   
-```kotlin
-lazySingleton { SomeObjectToBeSingleton() }
-```
-
-3. Providers, a new instance will be created on each `resolve()` call:
+2. Providers, a new instance will be created on each `resolve()` call:
 
 ```kotlin
 provider { SomeObjectToBeProvider() }
 ```
 
-4. Lazy providers, a new instance will be created on each `resolve()` call. Unlikely the providers, 
-   a real instance in the memory will be initialized at the first access moment:
+3. Weak singletons, they allow to inflate instances that may be unavailable in any time. Unlikely 
+   the singletons, a real instance won't be held by Neutrino:
    
 ```kotlin
 provider { SomeObjectToBeProvider() }
@@ -145,17 +133,12 @@ provider { SomeObjectToBeProvider() }
 
 - [x] Singletons
 - [x] Providers
-- [x] Lazy singletons
-- [x] Lazy providers
+- [x] Lazy resolving
 - [x] Module support
 - [x] Multiple injectors
-- [ ] Weak references
+- [x] Weak references
 - [ ] Thread safety
 - [ ] Swift-friendly
-
-## Pull requests
-
-Any changes in pull requests must be offshoots from the devel branch.
 
 ## Licensing
 Project is licensed under the MIT license. See [LICENSE](LICENSE.txt) for the full license text.
