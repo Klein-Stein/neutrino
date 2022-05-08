@@ -6,6 +6,16 @@ import io.github.kleinstein.neutrino.contracts.IModule
 import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 import kotlin.reflect.KClass
 
+/**
+ * A dependency injector
+ *
+ * Injectors can be used separately or as [DI] instance's children to inject dependencies
+ *
+ * @property name Injector name
+ * @property body Initialization block of modules
+ * @property size The number of attached modules
+ * @constructor Creates a new injector
+ */
 class Injector(override val name: String, private val body: IExtendable<IModule>.() -> Unit) :
     IInjector {
     private val modules = mutableListOf<IModule>()

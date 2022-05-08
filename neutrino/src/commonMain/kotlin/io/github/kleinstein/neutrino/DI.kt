@@ -2,14 +2,35 @@ package io.github.kleinstein.neutrino
 
 import io.github.kleinstein.neutrino.fabrics.Provider
 import io.github.kleinstein.neutrino.contracts.*
+import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 import io.github.kleinstein.neutrino.fabrics.Singleton
 import io.github.kleinstein.neutrino.fabrics.WeakSingleton
 
+/**
+ * DI container interface
+ */
 interface DI: IBuildable<DI>, IExtendable<IInjector>, Collection<Map.Entry<String, IInjector>> {
+
+    /**
+     * Returns an attached injector by name
+     *
+     * @param name Injector name
+     * @return An attached [IInjector]'s instance or throws [an exception][NeutrinoException]
+     */
     operator fun get(name: String): IInjector
-    operator fun invoke(): IInjector
+
+    /**
+     * Returns an attached injector by name or the first one
+     *
+     * @param name Injector name (can be `null` if there is a single attached injector)
+     * @return An attached [IInjector]'s instance or throws [an exception][NeutrinoException]
+     */
+    operator fun invoke(name: String? = null): IInjector
 
     companion object {
+        /**
+         * A global instance of [DI container][DI], use this instance to attach injectors
+         */
         val global = NeutrinoDI {}
         fun module(name: String, body: IModule.() -> Unit): IModule = Module(name, body)
         fun injector(name: String, body: IExtendable<IModule>.() -> Unit): IInjector =

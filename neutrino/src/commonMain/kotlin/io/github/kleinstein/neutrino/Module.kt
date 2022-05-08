@@ -6,13 +6,24 @@ import io.github.kleinstein.neutrino.contracts.IFabric
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
 
+/**
+ * [Injector]'s module
+ *
+ * Modules allow to split dependencies into separate independent groups that can be convenient for
+ * decomposition of their initialization
+ *
+ * @property name Module name
+ * @param body Initialization block of dependencies
+ * @property size The number of added injections
+ * @constructor Creates a new module
+ */
 class Module(override val name: String, private val body: IModule.() -> Unit) : IModule {
     private val fabrics = hashMapOf<String, IFabric<*>>()
 
     override val size: Int
         get() = fabrics.size
 
-    override fun <T : Any> addFabric(tag: String, fabric: IFabric<T>) {
+    override fun addFabric(tag: String, fabric: IFabric<*>) {
         fabrics[tag] = fabric
     }
 

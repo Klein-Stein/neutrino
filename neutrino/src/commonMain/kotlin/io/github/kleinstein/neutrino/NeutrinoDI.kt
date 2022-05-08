@@ -3,6 +3,17 @@ package io.github.kleinstein.neutrino
 import io.github.kleinstein.neutrino.contracts.IInjector
 import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 
+/**
+ * Implementation of [the DI container interface][DI]
+ *
+ * This class is used to hold all dependency injectors. Neutrino already has a global instance of
+ * this DI container but you can still create additional instances.
+ * @see DI.global
+ *
+ * @property body Initialization block of injectors
+ * @property size The number of attached injectors
+ * @constructor Creates a new DI container
+ */
 class NeutrinoDI(private val body: NeutrinoDI.() -> Unit): DI {
     private val injectors = hashMapOf<String, IInjector>()
 
@@ -33,13 +44,19 @@ class NeutrinoDI(private val body: NeutrinoDI.() -> Unit): DI {
 
     override fun iterator(): Iterator<Map.Entry<String, IInjector>> = injectors.iterator()
 
-    override operator fun get(name: String): IInjector = injectors[name]!!
-    override operator fun invoke(): IInjector {
-        if (injectors.size == 1) {
+    override operator fun get(name: String): IInjector = injectors[name] ?: throw NeutrinoException(
+        "Injector `$name` not found"
+    )
+
+    override operator fun invoke(name: String?): IInjector {
+        if (name == null && injectors.size == 1) {
             return injectors.entries.first().value
         }
+        if (name != null) {
+            return get(name)
+        }
         throw NeutrinoException(
-            "More than 1 registered injector found, use `[]` to select the correct injector"
+            "More than 1 registered injector found, pass a name to select the correct injector"
         )
     }
 

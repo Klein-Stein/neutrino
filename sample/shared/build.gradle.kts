@@ -25,7 +25,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("io.github.klein-stein:neutrino:1.0")
+                implementation("io.github.klein-stein:neutrino:2.0")
             }
         }
         val commonTest by getting {

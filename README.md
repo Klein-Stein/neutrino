@@ -10,7 +10,7 @@ Gradle (Groovy):
 ```groovy
 commonMain {
     dependencies {
-        implementation 'io.github.klein-stein:neutrino:1.0'
+        implementation 'io.github.klein-stein:neutrino:2.0'
     }
 }
 ```
@@ -20,7 +20,7 @@ Gradle (Kotlin DSL):
 ```kotlin
 commonMain {
     dependencies {
-        implementation("io.github.klein-stein:neutrino:1.0")
+        implementation("io.github.klein-stein:neutrino:2.0")
     }
 }
 ```
@@ -126,7 +126,7 @@ provider { SomeObjectToBeProvider() }
    the singletons, a real instance won't be held by Neutrino:
    
 ```kotlin
-provider { SomeObjectToBeProvider() }
+weakSingleton { SomeObjectToBeProvider() }
 ```
 
 ## Roadmap
