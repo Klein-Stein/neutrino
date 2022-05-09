@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> IResolvable.resolve(tag: String, objCClass: ObjCClass): T =
-    resolve(tag, getOriginalKotlinClass(objCClass) as KClass<out T>)
+    resolve(getOriginalKotlinClass(objCClass) as KClass<out T>, tag)
 
 @Suppress("UNCHECKED_CAST")
 fun <T: Any> IResolvable.resolve(objCClass: ObjCClass): T =

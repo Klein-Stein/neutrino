@@ -1,7 +1,11 @@
 package io.github.kleinstein.neutrino
 
+import io.github.kleinstein.neutrino.fabrics.Provider
 import io.github.kleinstein.neutrino.fabrics.Singleton
 import io.github.kleinstein.neutrino.fabrics.Stub
+import io.github.kleinstein.neutrino.fabrics.WeakSingleton
+import io.github.kleinstein.neutrino.references.WeakReference
+import kotlin.reflect.typeOf
 import kotlin.test.*
 
 class ModuleTest {
@@ -17,28 +21,36 @@ class ModuleTest {
     fun buildingTest() {
         val module = Module("test") {
             addFabric("stub1", Singleton { Stub() })
-            addFabric("stub2", Singleton { Stub() })
+            addFabric("stub2", Provider { Stub() })
+            addFabric("stub3", WeakSingleton { Stub() })
         }
         assertTrue(module.isEmpty())
         assertEquals(0, module.size)
         module.build()
         assertTrue(module.isNotEmpty())
         assertEquals(2, module.size)
-        assertTrue { module.containsTag("stub1") }
-        assertTrue { module.containsTag("stub2") }
+        assertTrue { module.contains("stub1") }
+        assertTrue { module.contains("stub2") }
+        assertTrue { module.contains("stub3") }
     }
 
     @Test
     fun resolvingTest() {
+        val stub3 = Stub("stub3")
         val module = Module("test") {
             addFabric("stub1", Singleton { Stub() })
+            addFabric("stub2", Provider { Stub() })
+            addFabric("stub3", WeakSingleton { stub3 })
         }.build()
-        val lazyStubSingleton1 = module.resolveLazy<Stub>("stub1")
-        val stub1 by lazyStubSingleton1
-        val stub2 = module.resolve("stub1", Stub::class)
-        assertFalse(lazyStubSingleton1.isInitialized())
-        assertNotEquals(stub1, stub2)
-        assertTrue(lazyStubSingleton1.isInitialized())
+        val stub1 = module.resolve<Stub>(typeOf<Stub>(), "stub1")
+        val stub2 = module.resolve<Stub>(typeOf<Stub>(), "stub2")
+        val stub3Ref = module.resolve<WeakReference<Stub>>(
+            typeOf<WeakReference<Stub>>(), "stub3"
+        )
+        assertEquals("stub1", stub1.name)
+        assertEquals("stub2", stub2.name)
+        assertEquals("stub3", stub3Ref.get()!!.name)
+        assertEquals("stub3", stub3.name) // To keep `stub3` in memory
     }
 
     @Test
