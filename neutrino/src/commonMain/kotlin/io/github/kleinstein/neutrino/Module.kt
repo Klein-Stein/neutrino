@@ -6,7 +6,7 @@ import io.github.kleinstein.neutrino.contracts.IFabric
 import kotlin.reflect.KType
 
 /**
- * [Injector]'s module
+ * [DI] container's module
  *
  * Modules allow to split dependencies into separate independent groups that can be convenient for
  * decomposition of their initialization
@@ -16,7 +16,7 @@ import kotlin.reflect.KType
  * @property size The number of added injections
  * @constructor Creates a new module
  */
-class Module(override val name: String, private val body: IModule.() -> Unit) : IModule {
+class Module(override val name: String, private val body: (IModule.() -> Unit)? = null) : IModule {
     private val fabrics = hashMapOf<Key, IFabric<*>>()
 
     override val size: Int
@@ -29,7 +29,7 @@ class Module(override val name: String, private val body: IModule.() -> Unit) : 
     override fun removeFabric(key: Key): Boolean = fabrics.remove(key) != null
 
     override fun build(): IModule {
-        body()
+        body?.let { it() }
         return this
     }
 
