@@ -6,7 +6,7 @@ package io.github.kleinstein.neutrino.references
  * @param T Referred object type
  * @param referred Referred object
  */
-expect class WeakReference<T: Any>(referred: T) {
+expect class Weak<T: Any>(referred: T) {
 
     /**
      * Returns a referred object or `null` if the object was deleted by GC

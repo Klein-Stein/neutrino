@@ -28,4 +28,23 @@ interface IResolvable {
      * @return Resolved child or throws [an exception][NeutrinoException]
      */
     fun <T: Any> resolve(kType: KType, tag: String? = null): T
+
+    /**
+     * Lazy returns a child from the container by the passed key
+     *
+     * @param T Child type
+     * @param key Child key
+     * @return Lazy resolved child or throws [an exception][NeutrinoException]
+     */
+    fun <T: Any> resolveLazy(key: Key): Lazy<T>
+
+    /**
+     * Lazy returns a child from the container by passed tag and child class
+     *
+     * @param T Child type
+     * @param kType Child type
+     * @param tag Child tag (optional)
+     * @return Lazy resolved child or throws [an exception][NeutrinoException]
+     */
+    fun <T: Any> resolveLazy(kType: KType, tag: String? = null): Lazy<T>
 }

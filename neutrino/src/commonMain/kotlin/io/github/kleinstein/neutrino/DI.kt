@@ -4,7 +4,7 @@ import io.github.kleinstein.neutrino.fabrics.Provider
 import io.github.kleinstein.neutrino.contracts.*
 import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 import io.github.kleinstein.neutrino.fabrics.Singleton
-import io.github.kleinstein.neutrino.fabrics.WeakSingleton
+import io.github.kleinstein.neutrino.references.Weak
 import kotlin.reflect.typeOf
 
 /**
@@ -55,17 +55,41 @@ interface DI: IResolvable, IBuildable<DI>, Collection<IModule> {
          * A global instance of [DI container][DI], use this instance to attach injectors
          */
         val global = NeutrinoDI {}
-        fun module(name: String, body: IModule.() -> Unit): IModule = Module(name, body)
+
+        /**
+         * Creates a new module without calling the [IModule.build] method
+         *
+         * @param name Module name
+         * @param body Initialization block of dependencies (optional)
+         * @return New module
+         */
+        fun module(name: String, body: (IModule.() -> Unit)? = null): IModule = Module(name, body)
     }
 }
 
+/**
+ * Adds a new fabric to the module
+ *
+ * @param fabric An instance of the [IFabric] implementation
+ */
 inline fun <reified T: Any> IModule.addFabric(fabric: IFabric<T>) =
     addFabric(Key(type = typeOf<T>()), fabric)
 
+/**
+ * Adds a fabric to the [module][IModule] as the singleton fabric
+ *
+ * @param fabric Dependency fabric
+ */
 inline fun <reified T: Any> IModule.singleton(noinline fabric: () -> T) {
     this.addFabric(Singleton(fabric))
 }
 
+/**
+ * Adds a fabric to the [module][IModule] as the singleton fabric
+ *
+ * @param tag Fabric tag
+ * @param fabric Dependency fabric
+ */
 inline fun <reified T: Any> IModule.singleton(tag: String, noinline fabric: () -> T) {
     this.addFabric(Key(
         type = typeOf<T>(),
@@ -73,21 +97,47 @@ inline fun <reified T: Any> IModule.singleton(tag: String, noinline fabric: () -
     ), Singleton(fabric))
 }
 
+/**
+ * Adds a fabric to the [module][IModule] as the weak singleton fabric
+ *
+ * @param fabric Dependency fabric
+ */
 inline fun <reified T: Any> IModule.weakSingleton(noinline fabric: () -> T) {
-    this.addFabric(WeakSingleton(fabric))
+    this.addFabric(Singleton<Weak<T>> {
+        Weak(fabric())
+    })
 }
 
+/**
+ * Adds a fabric to the [module][IModule] as the weak singleton fabric
+ *
+ * @param tag Fabric tag
+ * @param fabric Dependency fabric
+ */
 inline fun <reified T: Any> IModule.weakSingleton(tag: String, noinline fabric: () -> T) {
     this.addFabric(Key(
-        type = typeOf<T>(),
+        type = typeOf<Weak<T>>(),
         tag = tag,
-    ), WeakSingleton(fabric))
+    ), Singleton {
+        Weak(fabric())
+    })
 }
 
+/**
+ * Adds a fabric to the [module][IModule] as the provider fabric
+ *
+ * @param fabric Dependency fabric
+ */
 inline fun <reified T: Any> IModule.provider(noinline fabric: () -> T) {
     this.addFabric(Provider(fabric))
 }
 
+/**
+ * Adds a fabric to the [module][IModule] as the provider fabric
+ *
+ * @param tag Fabric tag
+ * @param fabric Dependency fabric
+ */
 inline fun <reified T: Any> IModule.provider(tag: String, noinline fabric: () -> T) {
     this.addFabric(Key(
         type = typeOf<T>(),
@@ -95,11 +145,37 @@ inline fun <reified T: Any> IModule.provider(tag: String, noinline fabric: () ->
     ), Provider(fabric))
 }
 
+/**
+ * Returns a child from the container by the passed tag
+ *
+ * @param T Child type
+ * @param tag Child tag
+ * @return Resolved child or throws [an exception][NeutrinoException]
+ */
 inline fun <reified T: Any> IResolvable.resolve(tag: String): T = resolve(typeOf<T>(), tag)
 
+/**
+ * Returns a child from the container
+ *
+ * @param T Child type
+ * @return Resolved child or throws [an exception][NeutrinoException]
+ */
 inline fun <reified T: Any> IResolvable.resolve(): T = resolve(typeOf<T>())
 
+/**
+ * Lazy returns a child from the container by the passed tag
+ *
+ * @param T Child type
+ * @param tag Child tag
+ * @return Lazy resolved child or throws [an exception][NeutrinoException]
+ */
 inline fun <reified T: Any> IResolvable.resolveLazy(tag: String): Lazy<T> =
-    lazy{ resolve(typeOf<T>(), tag) }
+    resolveLazy(typeOf<T>(), tag)
 
-inline fun <reified T: Any> IResolvable.resolveLazy(): Lazy<T> = lazy { resolve(typeOf<T>()) }
+/**
+ * Lazy returns a child from the container by the passed tag
+ *
+ * @param T Child type
+ * @return Lazy resolved child or throws [an exception][NeutrinoException]
+ */
+inline fun <reified T: Any> IResolvable.resolveLazy(): Lazy<T> = resolveLazy(typeOf<T>())

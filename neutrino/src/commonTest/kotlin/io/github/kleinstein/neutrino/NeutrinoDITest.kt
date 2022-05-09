@@ -4,8 +4,7 @@ import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 import io.github.kleinstein.neutrino.fabrics.Provider
 import io.github.kleinstein.neutrino.fabrics.Singleton
 import io.github.kleinstein.neutrino.fabrics.Stub
-import io.github.kleinstein.neutrino.fabrics.WeakSingleton
-import io.github.kleinstein.neutrino.references.WeakReference
+import io.github.kleinstein.neutrino.references.Weak
 import kotlin.reflect.typeOf
 import kotlin.test.*
 
@@ -65,7 +64,7 @@ class NeutrinoDITest {
         val module1 = Module("module1") {
             addFabric(Key(type = typeOf<Stub>(), tag = "stub1"), Singleton { Stub("stub1") })
             addFabric(Key(type = typeOf<Stub>(), tag = "stub2"), Provider { Stub("stub2") })
-            addFabric(Key(type = typeOf<Stub>(), tag = "stub3"), WeakSingleton { stub3 })
+            addFabric(Key(type = typeOf<Weak<Stub>>(), tag = "stub3"), Singleton { Weak(stub3) })
         }
         val module2 = Module("module2") {
             addFabric(Key(type = typeOf<Stub>(), tag = "stub4"), Singleton { Stub("stub4") })
@@ -75,7 +74,7 @@ class NeutrinoDITest {
         }.build()
         val stub1 = di.resolve<Stub>(typeOf<Stub>(), "stub1")
         val stub2 = di.resolve<Stub>(typeOf<Stub>(), "stub2")
-        val stub3Ref = di.resolve<WeakReference<Stub>>(typeOf<Stub>(), "stub3")
+        val stub3Ref = di.resolve<Weak<Stub>>(typeOf<Weak<Stub>>(), "stub3")
         val stub4 = di.resolve<Stub>(typeOf<Stub>(), "stub4")
         assertEquals("stub1", stub1.name)
         assertEquals("stub2", stub2.name)

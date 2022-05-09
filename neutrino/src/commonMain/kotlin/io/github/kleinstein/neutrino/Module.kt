@@ -12,7 +12,7 @@ import kotlin.reflect.KType
  * decomposition of their initialization
  *
  * @property name Module name
- * @param body Initialization block of dependencies
+ * @param body Initialization block of dependencies (optional)
  * @property size The number of added injections
  * @constructor Creates a new module
  */
@@ -57,5 +57,11 @@ class Module(override val name: String, private val body: (IModule.() -> Unit)? 
         return obj as? T ?: throw NeutrinoException(
             "Resolved object can't be casted to required type"
         )
+    }
+
+    override fun <T : Any> resolveLazy(key: Key): Lazy<T> = lazy { resolve(key) }
+
+    override fun <T : Any> resolveLazy(kType: KType, tag: String?): Lazy<T> = lazy {
+        resolve(kType, tag)
     }
 }

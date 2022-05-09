@@ -5,12 +5,12 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class WeakReferenceTest {
+class WeakTest {
 
     @Test
     fun clearTest() {
         val stub = Stub("test")
-        val ref = WeakReference(stub)
+        val ref = Weak(stub)
         assertTrue(ref.get() != null)
         ref.clear()
         assertTrue(ref.get() == null)

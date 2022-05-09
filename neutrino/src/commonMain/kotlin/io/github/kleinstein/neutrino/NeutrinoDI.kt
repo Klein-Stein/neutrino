@@ -11,7 +11,7 @@ import kotlin.reflect.KType
  * this DI container but you can still create additional instances.
  * @see DI.global
  *
- * @property body Initialization block of modules
+ * @property body Initialization block of modules (optional)
  * @property size The number of attached modules
  * @constructor Creates a new DI container
  */
@@ -62,6 +62,16 @@ class NeutrinoDI(private val body: (DI.() -> Unit)? = null): DI {
         val module = modules.firstOrNull { it.contains(key) }
         return module?.resolve(key) ?: throw NeutrinoException("The `$key` not found")
     }
+
+    override fun <T : Any> resolveLazy(key: Key): Lazy<T> {
+        val module = modules.firstOrNull { it.contains(key) }
+        return module?.resolveLazy(key) ?: throw NeutrinoException("The `$key` not found")
+    }
+
+    override fun <T : Any> resolveLazy(kType: KType, tag: String?): Lazy<T> = resolveLazy(Key(
+        type = kType,
+        tag = tag,
+    ))
 
     override fun build(): DI {
         body?.let { it() }
