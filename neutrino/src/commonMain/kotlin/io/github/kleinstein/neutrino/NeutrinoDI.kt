@@ -1,50 +1,80 @@
 package io.github.kleinstein.neutrino
 
-import io.github.kleinstein.neutrino.contracts.IInjector
+import io.github.kleinstein.neutrino.contracts.IModule
 import io.github.kleinstein.neutrino.exceptions.NeutrinoException
+import kotlin.reflect.KType
 
-class NeutrinoDI(private val body: NeutrinoDI.() -> Unit): DI {
-    private val injectors = hashMapOf<String, IInjector>()
+/**
+ * Implementation of the [DI container interface][DI]
+ *
+ * This class is used to hold all modules. Neutrino already has a global instance of
+ * this DI container but you can still create additional instances.
+ * @see DI.global
+ *
+ * @property body Initialization block of modules (optional)
+ * @property size The number of attached modules
+ * @constructor Creates a new DI container
+ */
+class NeutrinoDI(private val body: (DI.() -> Unit)? = null): DI {
+    private val modules = mutableListOf<IModule>()
 
     override val size: Int
-        get() = injectors.size
+        get() = modules.size
 
-    override fun attach(child: IInjector) {
-        injectors[child.name] = child.build()
+    override fun attach(child: IModule) {
+        modules.add(child.build())
     }
 
-    override fun attachAll(vararg children: IInjector) {
-        if (children.any()) {
-            children.forEach { attach(it) }
+    override fun attachAll(vararg children: IModule) {
+        modules.addAll(children)
+        children.forEach { it.build() }
+    }
+
+    override fun contains(name: String): Boolean = modules.any { it.name == name }
+
+    override fun contains(element: IModule): Boolean = modules.contains(element)
+
+    override fun detach(name: String): IModule? {
+        val module = modules.firstOrNull { it.name == name }
+        if (module != null) {
+            modules.remove(module)
         }
+        return module
     }
 
-    override fun contains(name: String): Boolean = injectors.containsKey(name)
+    override fun containsAll(elements: Collection<IModule>): Boolean =
+        modules.containsAll(elements)
 
-    override fun contains(element: Map.Entry<String, IInjector>): Boolean =
-        injectors.entries.contains(element)
+    override fun isEmpty(): Boolean = modules.isEmpty()
 
-    override fun detach(name: String): IInjector? = injectors.remove(name)
+    override fun iterator(): Iterator<IModule> = modules.iterator()
 
-    override fun containsAll(elements: Collection<Map.Entry<String, IInjector>>): Boolean =
-        injectors.entries.containsAll(elements)
+    override operator fun get(name: String): IModule = modules.firstOrNull { it.name == name } ?:
+        throw NeutrinoException("Module `$name` not found")
 
-    override fun isEmpty(): Boolean = injectors.isEmpty()
+    override fun <T : Any> resolve(kType: KType, tag: String?): T = resolve(Key(
+        type = kType,
+        tag = tag,
+    ))
 
-    override fun iterator(): Iterator<Map.Entry<String, IInjector>> = injectors.iterator()
-
-    override operator fun get(name: String): IInjector = injectors[name]!!
-    override operator fun invoke(): IInjector {
-        if (injectors.size == 1) {
-            return injectors.entries.first().value
-        }
-        throw NeutrinoException(
-            "More than 1 registered injector found, use `[]` to select the correct injector"
-        )
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> resolve(key: Key): T {
+        val module = modules.firstOrNull { it.contains(key) }
+        return module?.resolve(key) ?: throw NeutrinoException("The `$key` not found")
     }
 
-    override fun build(): NeutrinoDI {
-        body()
+    override fun <T : Any> resolveLazy(key: Key): Lazy<T> {
+        val module = modules.firstOrNull { it.contains(key) }
+        return module?.resolveLazy(key) ?: throw NeutrinoException("The `$key` not found")
+    }
+
+    override fun <T : Any> resolveLazy(kType: KType, tag: String?): Lazy<T> = resolveLazy(Key(
+        type = kType,
+        tag = tag,
+    ))
+
+    override fun build(): DI {
+        body?.let { it() }
         return this
     }
 }

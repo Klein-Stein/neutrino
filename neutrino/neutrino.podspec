@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'neutrino'
-    spec.version                  = '1.0'
+    spec.version                  = '2.0'
     spec.homepage                 = 'https://klein-stein.github.io/neutrino/'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''

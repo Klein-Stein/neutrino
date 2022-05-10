@@ -3,10 +3,11 @@ plugins {
     kotlin("native.cocoapods")
     id("convention.publication")
     id("com.android.library")
+    id("org.jetbrains.dokka")
 }
 
 group = "io.github.klein-stein"
-version = "1.0"
+version = "2.0"
 
 kotlin {
     android()
@@ -64,4 +65,8 @@ android {
         minSdk = 16
         targetSdk = 32
     }
+}
+
+tasks.dokkaHtml.configure {
+    outputDirectory.set(buildDir.resolve("dokkaHtml"))
 }

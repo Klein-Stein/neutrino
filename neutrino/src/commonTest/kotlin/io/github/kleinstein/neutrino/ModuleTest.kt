@@ -1,8 +1,10 @@
 package io.github.kleinstein.neutrino
 
-import io.github.kleinstein.neutrino.fabrics.LazySingleton
+import io.github.kleinstein.neutrino.fabrics.Provider
 import io.github.kleinstein.neutrino.fabrics.Singleton
 import io.github.kleinstein.neutrino.fabrics.Stub
+import io.github.kleinstein.neutrino.references.Weak
+import kotlin.reflect.typeOf
 import kotlin.test.*
 
 class ModuleTest {
@@ -17,39 +19,42 @@ class ModuleTest {
     @Test
     fun buildingTest() {
         val module = Module("test") {
-            addFabric("stub1", Singleton { Stub() })
-            addFabric("stub2", Singleton { Stub() })
+            addFabric(Key(type = typeOf<Stub>(), tag = "stub1"), Singleton { Stub() })
+            addFabric(Key(type = typeOf<Stub>(), tag = "stub2"), Provider { Stub() })
         }
         assertTrue(module.isEmpty())
         assertEquals(0, module.size)
         module.build()
         assertTrue(module.isNotEmpty())
         assertEquals(2, module.size)
-        assertTrue { module.containsTag("stub1") }
-        assertTrue { module.containsTag("stub2") }
+        assertTrue { module.contains(Key(type = typeOf<Stub>(), tag = "stub1")) }
+        assertTrue { module.contains(Key(type = typeOf<Stub>(), tag = "stub2")) }
     }
 
     @Test
     fun resolvingTest() {
+        val stub3 = Stub("stub3")
         val module = Module("test") {
-            addFabric("stub1", LazySingleton { Stub() })
-            addFabric("stub2", Singleton { Stub() })
+            addFabric(Key(type = typeOf<Stub>(), tag = "stub1"), Singleton { Stub("stub1") })
+            addFabric(Key(type = typeOf<Stub>(), tag = "stub2"), Provider { Stub("stub2") })
+            addFabric(Key(type = typeOf<Weak<Stub>>(), tag = "stub3"), Singleton { Weak(stub3) })
         }.build()
-        val lazyStubSingleton1 = module.resolveLazy("stub1", Stub::class)
-        val stub1 by lazyStubSingleton1
-        val stub2 = module.resolve("stub2", Stub::class)
-        assertFalse(lazyStubSingleton1.isInitialized())
-        assertNotEquals(stub1, stub2)
-        assertTrue(lazyStubSingleton1.isInitialized())
+        val stub1 = module.resolve<Stub>(typeOf<Stub>(), "stub1")
+        val stub2 = module.resolve<Stub>(typeOf<Stub>(), "stub2")
+        val stub3Ref = module.resolve<Weak<Stub>>(typeOf<Weak<Stub>>(), "stub3")
+        assertEquals("stub1", stub1.name)
+        assertEquals("stub2", stub2.name)
+        assertEquals("stub3", stub3Ref.get()!!.name)
+        assertEquals("stub3", stub3.name) // To keep `stub3` in memory
     }
 
     @Test
     fun removingTest() {
         val module = Module("test") {
-            addFabric("stub1", Singleton { Stub() })
+            addFabric(Key(type = typeOf<Stub>(), tag = "stub1"), Singleton { Stub() })
         }.build()
         assertTrue(module.isNotEmpty())
-        module.removeFabric("stub1")
+        module.removeFabric(Key(type = typeOf<Stub>(), tag = "stub1"))
         assertTrue(module.isEmpty())
     }
 }

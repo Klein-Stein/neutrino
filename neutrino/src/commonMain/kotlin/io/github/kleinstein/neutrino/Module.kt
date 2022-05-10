@@ -3,73 +3,65 @@ package io.github.kleinstein.neutrino
 import io.github.kleinstein.neutrino.contracts.IModule
 import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 import io.github.kleinstein.neutrino.contracts.IFabric
-import io.github.kleinstein.neutrino.contracts.ILazyFabric
-import kotlin.reflect.KClass
-import kotlin.reflect.cast
+import kotlin.reflect.KType
 
-class Module(override val name: String, private val body: IModule.() -> Unit) :
-    IModule {
-    private val fabrics = hashMapOf<String, IFabric<*>>()
+/**
+ * [DI] container's module
+ *
+ * Modules allow to split dependencies into separate independent groups that can be convenient for
+ * decomposition of their initialization
+ *
+ * @property name Module name
+ * @param body Initialization block of dependencies (optional)
+ * @property size The number of added injections
+ * @constructor Creates a new module
+ */
+class Module(override val name: String, private val body: (IModule.() -> Unit)? = null) : IModule {
+    private val fabrics = hashMapOf<Key, IFabric<*>>()
 
     override val size: Int
         get() = fabrics.size
 
-    override fun <T : Any> addFabric(tag: String, fabric: IFabric<T>) {
-        fabrics[tag] = fabric
+    override fun addFabric(key: Key, fabric: IFabric<*>) {
+        fabrics[key] = fabric
     }
 
-    override fun removeFabric(tag: String): Boolean = fabrics.remove(tag) != null
+    override fun removeFabric(key: Key): Boolean = fabrics.remove(key) != null
 
     override fun build(): IModule {
-        body()
+        body?.let { it() }
         return this
     }
 
-    override fun containsAll(elements: Collection<Map.Entry<String, IFabric<*>>>): Boolean =
+    override fun containsAll(elements: Collection<Map.Entry<Key, IFabric<*>>>): Boolean =
         fabrics.entries.containsAll(elements)
 
     override fun isEmpty(): Boolean = fabrics.isEmpty()
 
-    override fun iterator(): Iterator<Map.Entry<String, IFabric<*>>> = fabrics.iterator()
+    override fun iterator(): Iterator<Map.Entry<Key, IFabric<*>>> = fabrics.iterator()
 
-    override fun containsTag(tag: String): Boolean = fabrics.containsKey(tag)
+    override fun contains(key: Key): Boolean = fabrics.containsKey(key)
 
-    override fun contains(element: Map.Entry<String, IFabric<*>>): Boolean =
+    override fun contains(element: Map.Entry<Key, IFabric<*>>): Boolean =
         fabrics.entries.contains(element)
 
-    override fun <T : Any> resolve(clazz: KClass<out T>): T = resolve(clazz.simpleName!!, clazz)
-
-    override fun <T : Any> resolve(tag: String, clazz: KClass<out T>): T {
-        val fabric = fabrics[tag] ?: throw NeutrinoException("The `$tag` not found")
-        val obj = fabric.buildOrGet()
-        if (obj::class != clazz) {
-            val objType = obj::class.simpleName!!
-            val tType = clazz.simpleName!!
-            throw NeutrinoException(
-                "Can't resolve `$tag` tag: `$objType` can't be casted to `$tType`"
-            )
-        }
-        return clazz.cast(obj)
-    }
-
-    override fun <T : Any> resolveLazy(clazz: KClass<out T>): Lazy<T> =
-        resolveLazy(clazz.simpleName!!, clazz)
+    override fun <T : Any> resolve(kType: KType, tag: String?): T = resolve(Key(
+        type = kType,
+        tag = tag,
+    ))
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> resolveLazy(tag: String, clazz: KClass<out T>): Lazy<T> {
-        val fabric = fabrics[tag] ?: throw NeutrinoException("The `$tag` not found")
-        if (fabric !is ILazyFabric<*>) {
-            throw NeutrinoException("Can't resolve `$tag` tag: the object is not lazy")
-        }
+    override fun <T : Any> resolve(key: Key): T {
+        val fabric = fabrics[key] ?: throw NeutrinoException("The `$key` not found")
         val obj = fabric.buildOrGet()
-        val castedObj = obj as? Lazy<T>
-        if (castedObj == null) {
-            val objType = obj::class.simpleName!!
-            val tType = clazz.simpleName!!
-            throw NeutrinoException(
-                "Can't resolve `$tag` tag: `Lazy<$objType>` can't be casted to `Lazy<$tType>`"
-            )
-        }
-        return castedObj
+        return obj as? T ?: throw NeutrinoException(
+            "Resolved object can't be casted to required type"
+        )
+    }
+
+    override fun <T : Any> resolveLazy(key: Key): Lazy<T> = lazy { resolve(key) }
+
+    override fun <T : Any> resolveLazy(kType: KType, tag: String?): Lazy<T> = lazy {
+        resolve(kType, tag)
     }
 }

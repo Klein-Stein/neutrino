@@ -10,6 +10,6 @@ import kotlin.native.concurrent.ThreadLocal
 object CommonInjector {
     val mainModule = DI.module("main") {
         singleton { Greeting() }
-        provider { GreetingContainer(resolve()) }
+        // provider { GreetingContainer(resolve()) }
     }
 }
