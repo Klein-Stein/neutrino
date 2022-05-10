@@ -63,4 +63,5 @@ android {
         minSdk = 16
         targetSdk = 32
     }
+    namespace = "io.github.kleinstein.neutrino.sample"
 }

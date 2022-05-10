@@ -1,6 +1,9 @@
 neutrino
 =========
 
+[![version](https://img.shields.io/badge/version-2.0-brightgreen)](https://mvnrepository.com/artifact/io.github.klein-stein/neutrino/2.0)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE.txt)
+
 Simple dependency injector for Kotlin Multiplatform Mobile
 
 ## Install
@@ -39,28 +42,34 @@ class Stub(val name: String)
 
 @ThreadLocal
 object CommonInjector {
-    private val mainModule = DI.module("main") {
-        singleton { Stub("mainSingleton") }
-        singleton("singleton2") { Stub("mainSingleton2") } // Use tags to inject two separate 
-                                                           // instances of the same type
-        provider("mainProvider") { Stub("mainProvider") }
+    private val uncontrollableStub = Stub("weakStub")
+   
+    private val mainModule = DI.module("mainModule") {
+        singleton { Stub("singleton1") }
+       
+        singleton("singleton2") { Stub("singleton2") }  // Use tags to inject two separate 
+                                                        // instances of the same type
+        provider("provider") { Stub("provider") }
+       
+        weakSingleton("weakSingleton") { uncontrollableStub }   // This object will be stored by the 
+                                                                // weak reference
     }
 
-    private val secondaryModule = DI.module("secondary") {
+    private val secondaryModule = DI.module("secondaryModule") {
         singleton("secondarySingleton") { Stub("secondarySingleton") }
+       
         provider("secondaryProvider") { Stub("secondaryProvider") }
     }
     
-    private val injector = DI.injector("default") {
-        attachAll(mainModule, secondaryModule)
+    private val di = DI.global.apply {
+        attachAll(mainModule, secondaryModule)  // Attach modules to the global DI container
 //        attach(mainModule)
 //        attach(secondaryModule)
     }
    
-    val di = DI.global.attach(injector)  // Attach the injector to the global DI container
     // We can also create a local DI container instance
     val diLocal: DI = NeutrinoDI {
-        attach(injector)
+        attachAll(mainModule, secondaryModule)
     }
 }
 ```
@@ -70,11 +79,21 @@ Example of injection for Android module or Common module:
 ```kotlin
 class SomeClass {
     private val di = DI.global()
-    val stubSingleton: Stub = di.resolve()  // mainSingleton
-    val stubSingleton2: Stub = di.resolve("singleton2") // mainSingleton2
-    val lazyStubSingleton: Stub by di.resolveLazy("mainLazySingleton") // mainLazySingleton
-    val newStubInstance: Stub = di.resolve("mainProvider") // mainProvider
-    val newLazyStubInstance: Stub by di.resolve("mainLazyProvider") // mainLazyProvider
+   
+    val stubSingleton: Stub = di.resolve()              // `singleton`
+   
+    val stubSingleton2: Stub = di.resolve("singleton2") // `singleton2`
+   
+    val lazyStubSingleton: Stub by di.resolveLazy()     // `singleton` with lazy initialization
+                                                        // (all calls must be lazy or object will be 
+                                                        // initialized on the first `resolve` call)
+   
+    val newStubInstance: Stub = di.resolve("provider")  // `provider`
+   
+    val newLazyStubInstance: Stub by di.resolveLazy("provider")     // `provider` with lazy 
+                                                                    // initialization
+   
+    val weakSingleton: Weak<Stub> = di.resolve("weakSingleton")     // `weakStub`
 }
 ```
 
@@ -82,12 +101,15 @@ Example of injection for iOS module:
 
 ```kotlin
 class MainInjector {
-   private val di = DI.global()
-   val stubSingleton: Stub = di.resolve()  // mainSingleton
-   val stubSingleton2: Stub = di.resolve("singleton2") // mainSingleton2
-   val lazyStubSingleton: Stub by di.resolveLazy("mainLazySingleton") // mainLazySingleton
-   fun newStubInstance() = di.resolve("mainProvider") // mainProvider
-   fun newLazyStubInstance() = di.resolve("mainLazyProvider") // mainLazyProvider
+   private val di = DI.global().apply {
+       attachAll(/* modules */)
+   }
+   
+   val singleton: Stub = di.resolve()  // `singleton`
+   
+   fun provider(): Stub = di.resolve("provider") // `provider`
+   
+   // And so on...
 }
 ```
 
@@ -100,17 +122,17 @@ class Injector {
 }
 
 struct ContentView: View {
-    let stubSingleton = Injector.main.stubSingleton
+    let singleton = Injector.main.singleton
 
 	var body: some View {
-        Text(stubSingleton.name)
+        Text(singleton.name)
 	}
 }
 ```
 
 Neutrino offers several fabrics to create objects:  
 
-1. Singletons, objects that will live while Neutrino module or references on the singletons exist:
+1. Singletons are objects that will live while Neutrino module or references on the singletons exist:
 
 ```kotlin
 singleton { SomeObjectToBeSingleton() }
@@ -122,11 +144,12 @@ singleton { SomeObjectToBeSingleton() }
 provider { SomeObjectToBeProvider() }
 ```
 
-3. Weak singletons, they allow to inflate instances that may be unavailable in any time. Unlikely 
+3. Weak singletons allow to inflate instances that may be unavailable in any time. Unlikely 
    the singletons, a real instance won't be held by Neutrino:
    
 ```kotlin
-weakSingleton { SomeObjectToBeProvider() }
+val someObjectToBeReferred = /* Initialization */
+weakSingleton { someObjectToBeReferred }
 ```
 
 ## Roadmap

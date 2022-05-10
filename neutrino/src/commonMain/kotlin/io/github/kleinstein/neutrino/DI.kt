@@ -5,6 +5,7 @@ import io.github.kleinstein.neutrino.contracts.*
 import io.github.kleinstein.neutrino.exceptions.NeutrinoException
 import io.github.kleinstein.neutrino.fabrics.Singleton
 import io.github.kleinstein.neutrino.references.Weak
+import kotlin.native.concurrent.ThreadLocal
 import kotlin.reflect.typeOf
 
 /**
@@ -50,11 +51,12 @@ interface DI: IResolvable, IBuildable<DI>, Collection<IModule> {
      */
     operator fun get(name: String): IModule
 
+    @ThreadLocal
     companion object {
         /**
          * A global instance of [DI container][DI], use this instance to attach injectors
          */
-        val global = NeutrinoDI {}
+        val global: DI = NeutrinoDI {}
 
         /**
          * Creates a new module without calling the [IModule.build] method

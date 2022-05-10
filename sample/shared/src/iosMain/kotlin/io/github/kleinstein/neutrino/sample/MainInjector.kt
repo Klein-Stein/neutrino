@@ -1,12 +1,12 @@
 package io.github.kleinstein.neutrino.sample
 
 import io.github.kleinstein.neutrino.DI
-import io.github.kleinstein.neutrino.resolve
+import io.github.kleinstein.neutrino.resolveLazy
 
 class MainInjector {
-    private val injector = DI.injector("main") {
+    private val di = DI.global.apply {
         attach(CommonInjector.mainModule)
-    }.build()
+    }
 
-    val greeting = injector.resolve<Greeting>()
+    val greeting by di.resolveLazy<Greeting>()
 }

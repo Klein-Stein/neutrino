@@ -17,6 +17,7 @@ android {
             isMinifyEnabled = false
         }
     }
+    namespace = "io.github.kleinstein.neutrino.sample.android"
 }
 
 dependencies {

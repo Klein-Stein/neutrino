@@ -15,11 +15,7 @@ class App: Application() {
         provider("provider") { Greeting() }
     }
 
-    private val injector = DI.injector("main") {
-        attachAll(androidModule, CommonInjector.mainModule)
-    }
-
     init {
-        DI.global.attach(injector)
+        DI.global.attachAll(androidModule, CommonInjector.mainModule)
     }
 }

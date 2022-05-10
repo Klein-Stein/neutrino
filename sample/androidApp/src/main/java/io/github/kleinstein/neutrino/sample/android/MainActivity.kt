@@ -8,8 +8,7 @@ import io.github.kleinstein.neutrino.DI
 import io.github.kleinstein.neutrino.resolve
 
 class MainActivity : AppCompatActivity() {
-    private val di = DI.global()
-    private val greeting: Greeting = di.resolve()
+    private val greeting: Greeting = DI.global.resolve()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
