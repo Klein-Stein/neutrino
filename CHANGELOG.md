@@ -8,11 +8,22 @@ Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [2.0] - 2022-05-10
+### Added
+- Weak references
+- KDoc
+### Deleted
+- Injectors (merged with DI container)
+### Fixed
+- Resolving dependencies by the type
+
 ## [1.0] - 2022-04-26
 ### Added
 - Basic project structure
 
 [Unreleased]:
-https://github.com/Klein-Stein/neutrino/compare/v1.0...devel
+https://github.com/Klein-Stein/neutrino/compare/v2.0...devel
+[2.0]:
+https://github.com/Klein-Stein/neutrino/compare/v1.0...v2.0
 [1.0]:
 https://github.com/Klein-Stein/neutrino/releases/tag/v1.0
