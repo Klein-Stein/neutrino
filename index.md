@@ -1,11 +1,11 @@
 ## Welcome to Neutrino
 
 [![version](https://img.shields.io/badge/version-2.0-brightgreen)](https://mvnrepository.com/artifact/io.github.klein-stein/neutrino/2.0)
-[![license](https://img.shields.io/badge/license-MIT-brightgreen)](LICENSE.txt)
+[![license](https://img.shields.io/badge/license-MIT-brightgreen)](https://github.com/Klein-Stein/neutrino/blob/master/LICENSE.txt)
 
 Simple dependency injector for Kotlin Mutiplatform Mobile. You can fully explore its code while drinking coffee.
 
-## Install
+## Installation
 
 Gradle (Groovy): 
 
@@ -123,9 +123,9 @@ class Injector {
 struct ContentView: View {
     let singleton = Injector.main.singleton
 
-	var body: some View {
+    var body: some View {
         Text(singleton.name)
-	}
+    }
 }
 ```
 
