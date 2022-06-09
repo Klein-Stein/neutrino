@@ -124,9 +124,9 @@ class Injector {
 struct ContentView: View {
     let singleton = Injector.main.singleton
 
-	var body: some View {
+    var body: some View {
         Text(singleton.name)
-	}
+    }
 }
 ```
 
